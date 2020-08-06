@@ -20,7 +20,7 @@ class Store {
     alias: string,
     set: StateXSetter,
     get: StateXGetter,
-    recordAction: any,
+    recordAction: any
   ) {
     this.ds = ds;
     this.alias = alias;
@@ -35,14 +35,14 @@ class Store {
       ds,
       alias,
       'originalRecords',
-      ':index',
+      ':index'
     );
     this.currentRecord = getPath('pageId', ds, alias, 'currentRecord');
     this.currentRecordIndex = getPath(
       'pageId',
       ds,
       alias,
-      ':currentRecordIndex',
+      ':currentRecordIndex'
     );
   }
 
@@ -79,7 +79,7 @@ class Store {
     if (originalRecs == null) {
       return false;
     }
-    return recs !== originalRecs;
+    return JSON.stringify(recs) !== JSON.stringify(originalRecs);
   };
 
   isRecordDirty = (index: number) => {
@@ -118,7 +118,7 @@ class Store {
         `Developer ErrorIndex [${index}] being set as current record index cannot be more than the total records [${
           //@ts-ignore
           this.records().length
-        }]! ${this.alias}`,
+        }]! ${this.alias}`
       );
     }
     //@ts-ignore
@@ -209,16 +209,23 @@ class Store {
       if (recIndex !== undefined && recIndex !== -1) {
         const currentRecord: any = this.get(this.recordIndexPath, {
           params: {
-            id: recIndex,
+            index: recIndex,
           },
         });
         if (currentRecord._rs === 'D') {
           this.recordAction(this.deleteFromStore(recIndex));
         } else {
-          const newRecord = { ...currentRecord, ...record };
-          this.set(this.recordIndexPath, newRecord, {
+          // const newRecord = { ...currentRecord, ...record };
+
+          this.set(this.originalRecordIndexPath, records[recIndex], {
             params: {
-              id: recIndex,
+              index: recIndex,
+            },
+          });
+
+          this.set(this.recordIndexPath, records[recIndex], {
+            params: {
+              index: recIndex,
             },
           });
         }
@@ -247,7 +254,7 @@ class Store {
     // @ts-ignore
     let dirtyRecords = this.records().filter(
       // @ts-ignore
-      (record: any) => record._rs !== 'Q',
+      (record: any) => record._rs !== 'Q'
     );
     return dirtyRecords;
   };

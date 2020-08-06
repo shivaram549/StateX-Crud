@@ -14,12 +14,6 @@ import RedoIcon from '@material-ui/icons/Redo';
 import RestoreIcon from '@material-ui/icons/Restore';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-// const useStyles = makeStyles(() =>
-//   createStyles({
-
-//   }),
-// );
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -33,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textTransform: 'none',
       marginLeft: 10,
     },
-  }),
+  })
 );
 
 export default function Demo() {
@@ -58,7 +52,6 @@ export default function Demo() {
   const onSave = () => {
     save();
   };
-
   const dis = !isStoreDirty();
 
   const handleAddEvent = (evt) => {
