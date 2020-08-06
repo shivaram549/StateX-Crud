@@ -17,8 +17,8 @@ class Store {
   originalRecordsPath: string[];
   originalRecordIndexPath: string[];
   recordIndexPath: string[];
-  currentRecord: string[];
-  currentRecordIndex: string[];
+  currentRecord: string[]; // remove this
+  currentRecordIndexPath: string[];
 
   constructor(
     ds: string,
@@ -150,6 +150,11 @@ class Store {
 
   isBusy = () => {
     return true;
+  };
+
+  resetCurrentRecord = () => {
+    const idx = this.get(this.currentRecordIndex);
+    this.resetRecord(idx);
   };
 
   resetRecord = (index: number) => {
