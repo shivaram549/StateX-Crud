@@ -20,6 +20,7 @@ export default (ds: string, dsAlias: string) => {
     isAttributeDirty: store.isAttributeDirty,
     reset: store.reset,
     resetRecord: store.resetRecord,
+    resetCurrentRecord: store.resetCurrentRecord,
     isRecordDirty: store.isRecordDirty,
     isStoreDirty: store.isStoreDirty,
     getCurrentRecord: store.getCurrentRecord,

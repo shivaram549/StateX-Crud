@@ -43,6 +43,7 @@ export default function Demo() {
     isStoreDirty,
     isAttributeDirty,
     reset,
+    resetCurrentRecord,
     isRecordDirty,
     currentRecord,
     isBusy,
@@ -156,7 +157,7 @@ export default function Demo() {
         variant='contained'
         color='default'
         className={classes.button}
-        // onClick={resetRecord()}
+        onClick={() => resetCurrentRecord()}
         startIcon={<RestoreIcon />}>
         Reset Current Record
       </Button>
