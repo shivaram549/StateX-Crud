@@ -4,10 +4,10 @@ import { post } from './api';
 
 export interface Data {
   [key: string]: any;
-  _orig: any;
+  // _orig: any;
   // key: string;
   // value: any;
-  _rs: string;
+  // _rs: string;
 }
 
 class Store {
