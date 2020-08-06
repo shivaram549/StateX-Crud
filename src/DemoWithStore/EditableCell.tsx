@@ -31,9 +31,11 @@ const EditableCell = (props: any) => {
           onChange={(e) => {
             setVal(e.target.value);
           }}
-          onBlur={(e) =>
-            props.onUpdate(props.cellData.id, { [props.cellData.type]: val })
-          }
+          onBlur={(e) => {
+            if (props.cellData.value !== val) {
+              props.onUpdate(props.cellData.id, { [props.cellData.type]: val });
+            }
+          }}
         />
       )}
     </td>

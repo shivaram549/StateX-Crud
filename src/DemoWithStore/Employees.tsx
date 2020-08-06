@@ -49,6 +49,7 @@ export default function Demo() {
     isBusy,
     setCurrentRecordIndex,
     currentRecordIndex,
+    deleteCurrentRecord,
   } = useStateXStore(ds, alias);
 
   const onSave = () => {
@@ -57,7 +58,7 @@ export default function Demo() {
   const dis = !isStoreDirty();
 
   const handleAddEvent = (evt) => {
-    createNew({});
+    createNew();
   };
 
   const handleReset = () => {
@@ -92,7 +93,16 @@ export default function Demo() {
     insertRecord(partialRecord);
   };
 
-  const employees: any = records().filter((record: any) => record._rs !== 'D');
+  const employees: any = records().filter((record: any) => {
+    console.log('<<rec', record);
+    if (record === undefined) {
+      return false;
+    }
+    if (record) {
+      return record._rs !== 'D';
+    }
+    return true;
+  });
 
   const refresh = () => {
     const filter = { _deleted: 'N' };
@@ -104,6 +114,10 @@ export default function Demo() {
     setCurrentRecordIndex(index);
   };
 
+  const deleteCurrRecord = () => {
+    deleteCurrentRecord();
+  };
+
   const classes = useStyles();
 
   return (
@@ -111,6 +125,7 @@ export default function Demo() {
       <Button
         variant='contained'
         color='secondary'
+        onClick={deleteCurrRecord}
         className={classes.button}
         startIcon={<DeleteIcon />}>
         Delete
@@ -168,7 +183,9 @@ export default function Demo() {
       <div className={classes.root}>
         {isBusy() ? <CircularProgress /> : null}
       </div>
-      <div>currentRecordIndex: {currentRecordIndex()}</div>
+      <div>
+        <strong>currentRecordIndex: {currentRecordIndex()}</strong>
+      </div>
 
       <EmployeeTable
         isRecordDirty={isRecordDirty}

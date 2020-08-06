@@ -4,9 +4,11 @@ import useDataStore from './useDataStore';
 
 export default (ds: string, dsAlias: string) => {
   const store = useDataStore(ds, dsAlias);
-  useStateXValue(store.recordsPath, []);
-  useStateXValue(store.isBusyPath, false);
   useStateXValue(store.currentRecordIndexPath, false);
+
+  useStateXValue(store.isBusyPath, false);
+
+  useStateXValue(store.recordsPath, []);
 
   return {
     query: store.query,
@@ -30,5 +32,6 @@ export default (ds: string, dsAlias: string) => {
     isBusy: store.isBusy,
     setCurrentRecordIndex: store.setCurrentRecordIndex,
     currentRecordIndex: store.currentRecordIndex,
+    deleteCurrentRecord: store.deleteCurrentRecord,
   };
 };

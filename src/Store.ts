@@ -69,7 +69,7 @@ class Store {
   setRecord = (index: number, record: Data) => {
     this.set(this.recordIndexPath, record, {
       params: {
-        index: index,
+        index,
       },
     });
   };
@@ -91,13 +91,16 @@ class Store {
   setOriginalRecord = (index: number, record: Data) => {
     this.set(this.originalRecordIndexPath, record, {
       params: {
-        index: index,
+        index,
       },
     });
   };
 
   isAttributeDirty = (recordIndex: number, attribute: string): boolean => {
     const record: Data = this.getRecord(recordIndex);
+    if (record === undefined) {
+      console.log('>>>>>get records', this.records());
+    }
     if (record._orig && record._orig[attribute]) {
       return record[attribute] !== record._orig[attribute];
     }
@@ -108,7 +111,14 @@ class Store {
     const recs = this.records();
     const originalRecs = this.originalRecords();
     if (originalRecs == null) {
-      return false;
+      let dirty = false;
+      for (let record of recs) {
+        if (record._rs === 'I') {
+          dirty = true;
+          break;
+        }
+      }
+      return dirty;
     }
     return JSON.stringify(recs) !== JSON.stringify(originalRecs);
   };
@@ -144,6 +154,11 @@ class Store {
   resetCurrentRecord = () => {
     const idx: number = this.get(this.currentRecordIndexPath);
     this.resetRecord(idx);
+  };
+
+  deleteCurrentRecord = () => {
+    const idx: number = this.get(this.currentRecordIndexPath);
+    this.delete(idx);
   };
 
   resetRecord = (index: number) => {
@@ -201,39 +216,31 @@ class Store {
   };
 
   updateFromServer = (recIndex: number, records: any) => {
-    this.setOriginalRecord(recIndex, records[recIndex]);
-    this.setRecord(recIndex, records[recIndex]);
+    const recss = records[recIndex];
+    if (recss === undefined || recss === null) {
+      console.log('::::recss', records);
+      throw Error('ERROR FROM UPDATE SERVER');
+    }
+    this.setOriginalRecord(recIndex, recss);
+    this.setRecord(recIndex, recss);
   };
 
-  // TODO: update records using index
+  //todo-locking
   updateRecords = (records: any) => {
     const storeRecords: Data[] = this.records();
+    console.log('dirtyRecords', this.dirtyRecords());
     this.dirtyRecords().forEach((record: any) => {
       const recIndex = storeRecords.indexOf(record);
-      // index based logic not working
       if (recIndex !== undefined && recIndex !== -1) {
         const currentRecord: any = this.getRecord(recIndex);
         if (currentRecord._rs === 'D') {
-          this.recordAction(this.deleteFromStore(recIndex));
+          this.deleteFromStore(recIndex);
         } else {
-          // const newRecord = { ...currentRecord, ...record };
           this.updateFromServer(recIndex, records);
         }
-      } else {
-        storeRecords.forEach((storeRecord: any) => {
-          if (record.name === storeRecord.name) {
-            const recIdx = storeRecords.indexOf(storeRecord);
-            if (record._deleted === 'Y' || record._rs === 'D') {
-              this.deleteFromStore(recIdx);
-            } else {
-              const newRecord = { ...storeRecord, ...record };
-              this.setRecord(recIdx, newRecord);
-            }
-          }
-        });
       }
     });
-    this.set(this.isBusyPath, false);
+    this.setBusy(false);
   };
 
   dirtyRecords = () => {
@@ -243,9 +250,9 @@ class Store {
     return dirtyRecords;
   };
 
-  isDirty = () => this.dirtyRecords().length > 0;
-
-  isBusy = () => this.get(this.isBusyPath);
+  isBusy = (): boolean => {
+    return this.get(this.isBusyPath);
+  };
 
   save = async () => {
     const dirtyRecords = this.dirtyRecords().map((dirtyRecord: any) => {
@@ -259,9 +266,7 @@ class Store {
         data: dirtyRecords,
       },
     };
-    this.set(this.isBusyPath, true);
-
-    console.log('reqBody', reqBody);
+    this.setBusy(true);
 
     await post(reqBody)
       .then((response) => {

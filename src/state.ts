@@ -46,18 +46,35 @@ export const recordAction = action(
       case 'D':
         if (index !== undefined) {
           path = store.recordIndexPath;
-          let record: Data = get(path, {
+          let targetRecord: Data = get(path, {
             params: { index },
           });
-          record = { ...record };
-          if (partialRecord) {
-            if (!record._orig && record._rs === 'Q') {
-              record = { ...record, _orig: record };
-            }
-            record = { ...record, ...partialRecord };
+          targetRecord = { ...targetRecord };
+          if (actionType === 'D') {
+            targetRecord = { ...targetRecord, _rs: 'D' };
+          } else if (partialRecord) {
+            Object.keys(partialRecord).forEach((key) => {
+              // targetRecord
+              const currVal = targetRecord[key];
+              const newVal = partialRecord[key];
+              if (currVal !== newVal) {
+                if (!targetRecord._orig && targetRecord._rs === 'Q') {
+                  targetRecord = { ...targetRecord, _orig: targetRecord };
+                }
+                targetRecord = { ...targetRecord, [key]: partialRecord[key] };
+                let _rs = '';
+                if (targetRecord._rs === 'N') {
+                  _rs = 'I';
+                } else if (targetRecord._rs === 'Q') {
+                  _rs = 'U';
+                }
+                if (_rs !== '') {
+                  targetRecord = { ...targetRecord, _rs };
+                }
+              }
+            });
           }
-          record = { ...record, _rs: actionType };
-          set(path, record, {
+          set(path, targetRecord, {
             params: { index },
           });
         }
@@ -65,8 +82,15 @@ export const recordAction = action(
         break;
 
       case 'DeleteFromStore':
-        if (index) {
+        if (index !== undefined && index !== -1) {
           path = store.recordsPath;
+          records = get(path) as [];
+          records = records
+            .slice(0, index)
+            .concat(records.slice(index + 1, records.length));
+          set(path, records);
+
+          path = store.originalRecordsPath;
           records = get(path) as [];
           records = records
             .slice(0, index)
