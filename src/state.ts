@@ -1,35 +1,24 @@
 import { action } from '@cloudio/statex';
 
-export {};
-
 export function getPath(
+  pageId: string,
   ds: string,
-  dsAlias: string,
-  indexKey?: string
+  alias: string,
+  recordsType?: string,
+  indexKey?: string,
 ): string[] {
-  const rootPath = [ds, dsAlias];
+  const rootPath = ['root', pageId, 'dataStore', ds, alias];
+  if (recordsType) {
+    rootPath[rootPath.length] = recordsType;
+  }
   if (indexKey) {
     rootPath[rootPath.length] = indexKey;
   }
+  console.log('root records path', rootPath);
   return rootPath;
 }
 
 // @ts-ignore
-
-export const deleteRecordAction = action(
-  (
-    { get, set },
-    { ds, alias, index }: { ds: string; alias: string; index: number }
-  ) => {
-    const path = getPath(ds, alias);
-    let records = get(path) as [];
-    // @ts-ignore
-    records = records
-      .slice(0, index)
-      .concat(records.slice(index + 1, records.length));
-    set(path, records);
-  }
-);
 
 export const recordAction = action(
   (
@@ -39,50 +28,58 @@ export const recordAction = action(
       actionType,
       index,
       partialRecord,
-    }: { store: any; actionType: string; index: number; partialRecord?: any }
+    }: { store: any; actionType: string; index?: number; partialRecord?: any },
   ) => {
-    const ds = store.ds;
-    const alias = store.alias;
     let path;
     let records;
     switch (actionType) {
+      case 'N':
+        path = store.recordsPath;
+        records = get(path) as [];
+        records = [...records, {}];
+        set(path, records);
+        break;
       case 'U':
       case 'D':
-        path = getPath(ds, alias, ':index');
-        let record = get(path, {
-          params: { index },
-        });
-        // @ts-ignore
-        record = { ...record };
-        if (partialRecord) {
+        if (index) {
+          path = store.recordIndexPath;
+          let record = get(path, {
+            params: { index },
+          });
           // @ts-ignore
-          record = { ...record, ...partialRecord };
+          record = { ...record };
+          if (partialRecord) {
+            // @ts-ignore
+            if (!record._orig && record._rs === 'Q') {
+              // @ts-ignore
+              record = { ...record, _orig: record };
+            }
+            // @ts-ignore
+            record = { ...record, ...partialRecord };
+          }
+          // @ts-ignore
+          record = { ...record, _rs: actionType };
+          // set back to list
+          // @ts-ignore
+          set(path, record, {
+            params: { index },
+          });
         }
-        // @ts-ignore
-        record = { ...record, _rs: actionType };
 
-        // set back to list
-        // @ts-ignore
-        set(path, record, {
-          params: { index },
-        });
-        break;
-      case 'I':
-        path = getPath(ds, alias);
-        records = get(path) as [];
-        records = [...records, { ...partialRecord, _rs: 'I' }];
-        set(path, records);
         break;
 
       case 'DeleteFromStore':
-        path = getPath(ds, alias);
-        records = get(path) as [];
-        // @ts-ignore
-        records = records
-          .slice(0, index)
-          .concat(records.slice(index + 1, records.length));
-        set(path, records);
+        if (index) {
+          path = store.recordsPath;
+          records = get(path) as [];
+          // @ts-ignore
+          records = records
+            .slice(0, index)
+            .concat(records.slice(index + 1, records.length));
+          set(path, records);
+        }
+
         break;
     }
-  }
+  },
 );

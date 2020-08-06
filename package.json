@@ -16,13 +16,18 @@
     "@types/node": "^14.0.13",
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
+    "material-ui-table-edit": "^3.0.3",
+    "namor": "^2.0.2",
     "react": "^16.13.1",
+    "react-data-grid": "^7.0.0-canary.17",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "react-table": "^7.5.0",
+    "styled-components": "^5.1.1",
     "typescript": "^3.9.5"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3003 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

@@ -1,10 +1,13 @@
+//@ts-nocheck
 import { useStateXValue } from '@cloudio/statex';
 import useDataStore from './useDataStore';
+import { pageContextAtom } from '../components/Components';
+import Store from './Store';
 
-export default (ds: string, alias: string) => {
-  //todo use pageId in path
-  useStateXValue([ds, alias], []);
-  const store = useDataStore(ds, alias);
+export default (ds: string, dsAlias: string) => {
+  const store = useDataStore(ds, dsAlias);
+  useStateXValue(store.recordsPath, []);
+  // useStateXValue(store.recordIndexPath, []);
 
   return {
     query: store.query,
@@ -15,5 +18,13 @@ export default (ds: string, alias: string) => {
     save: store.save,
     records: store.records,
     isDirty: store.isDirty,
+    isAttributeDirty: store.isAttributeDirty,
+    reset: store.reset,
+    resetRecord: store.resetRecord,
+    isRecordDirty: store.isRecordDirty,
+    isStoreDirty: store.isStoreDirty,
+    getCurrentRecord: store.getCurrentRecord,
+    setCurrentRecord: store.setCurrentRecord,
+    createNew: store.createNew,
   };
 };

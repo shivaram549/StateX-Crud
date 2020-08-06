@@ -9,7 +9,7 @@ import * as serviceWorker from './serviceWorker';
 ReactDOM.render(
   <React.StrictMode>
     <StateXProvider>
-      <Demo />
+      <App />
     </StateXProvider>
   </React.StrictMode>,
   document.getElementById('root')

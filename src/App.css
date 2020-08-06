@@ -29,3 +29,26 @@
 .counter-label {
   width: 80px;
 }
+
+.dirtyCell {
+  border-color: red;
+}
+
+.dirty {
+  position: relative;
+}
+.dirty::before {
+  border-color: red transparent transparent red;
+  border-style: solid;
+  border-width: 3px;
+  content: '';
+  height: 0;
+  left: 0;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  vertical-align: top;
+  width: 0;
+  z-index: 1;
+}
