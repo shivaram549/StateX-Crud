@@ -18,7 +18,7 @@ class Store {
   originalRecordIndexPath: string[];
   recordIndexPath: string[];
   currentRecord: string[]; // remove this
-  currentRecordIndexPath: string[];
+  currentRecordIndex: string[];
 
   constructor(
     ds: string,
@@ -153,7 +153,7 @@ class Store {
   };
 
   resetCurrentRecord = () => {
-    const idx = this.get(this.currentRecordIndex);
+    const idx: number = this.get(this.currentRecordIndex);
     this.resetRecord(idx);
   };
 
