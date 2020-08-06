@@ -28,7 +28,7 @@ class Store {
     alias: string,
     set: StateXSetter,
     get: StateXGetter,
-    recordAction: any
+    recordAction: any,
   ) {
     this.ds = ds;
     this.alias = alias;
@@ -43,13 +43,13 @@ class Store {
       ds,
       alias,
       'originalRecords',
-      ':index'
+      ':index',
     );
     this.currentRecordIndexPath = getPath(
       'pageId',
       ds,
       alias,
-      'currentRecordIndex'
+      'currentRecordIndex',
     );
     this.isBusyPath = getPath('pageId', ds, alias, 'busy');
   }
@@ -137,7 +137,7 @@ class Store {
       throw Error(
         `Developer ErrorIndex [${index}] being set as current record index cannot be more than the total records [${
           this.records().length
-        }]! ${this.alias}`
+        }]! ${this.alias}`,
       );
     }
     this.set(this.currentRecordIndexPath, index);
@@ -215,37 +215,34 @@ class Store {
     });
   };
 
-  updateFromServer = (recIndex: number, records: any) => {
-    const recss = records[recIndex];
-    if (recss === undefined || recss === null) {
-      console.log('::::recss', records);
-      throw Error('ERROR FROM UPDATE SERVER');
-    }
-    this.setOriginalRecord(recIndex, recss);
-    this.setRecord(recIndex, recss);
+  updateFromServer = (recIndex: number, record: Data) => {
+    this.setOriginalRecord(recIndex, record);
+    this.setRecord(recIndex, record);
   };
 
   //todo-locking
-  updateRecords = (records: any) => {
+  updateRecords = (records: Data[]) => {
     const storeRecords: Data[] = this.records();
-    console.log('dirtyRecords', this.dirtyRecords());
-    this.dirtyRecords().forEach((record: any) => {
-      const recIndex = storeRecords.indexOf(record);
+    const dirtyRecords = this.dirtyRecords();
+    const size = dirtyRecords.length;
+    for (let i = 0; i < size; i++) {
+      const dirtyRec: Data = dirtyRecords[i];
+      const recIndex = storeRecords.indexOf(dirtyRec);
       if (recIndex !== undefined && recIndex !== -1) {
         const currentRecord: any = this.getRecord(recIndex);
         if (currentRecord._rs === 'D') {
           this.deleteFromStore(recIndex);
         } else {
-          this.updateFromServer(recIndex, records);
+          this.updateFromServer(recIndex, records[i]);
         }
       }
-    });
+    }
     this.setBusy(false);
   };
 
   dirtyRecords = () => {
     let dirtyRecords = this.records().filter(
-      (record: any) => record._rs !== 'Q'
+      (record: any) => record._rs !== 'Q',
     );
     return dirtyRecords;
   };
@@ -284,6 +281,19 @@ class Store {
       actionType: 'D',
       index,
     });
+
+    if (this.currentRecordIndex() === index) {
+      const next = index + 1;
+      const records = this.records();
+      // .filter(
+      //   (record: Data) => record._rs !== 'D',
+      // );
+      if (next < records.length) {
+        this.setCurrentRecordIndex(next);
+      } else {
+        this.setCurrentRecordIndex(-1);
+      }
+    }
   };
 
   deleteFromStore = (index: number) => {
