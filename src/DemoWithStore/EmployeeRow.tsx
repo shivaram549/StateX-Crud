@@ -23,6 +23,7 @@ const EmployeeRow = (props: any) => {
         }}
       />
       <EditableCell
+        onUpdate={props.onUpdate}
         onEmployeeTableUpdate={props.onEmployeeTableUpdate}
         isAttributeDirty={props.isAttributeDirty}
         cellData={{
@@ -32,6 +33,7 @@ const EmployeeRow = (props: any) => {
         }}
       />
       <EditableCell
+        onUpdate={props.onUpdate}
         onEmployeeTableUpdate={props.onEmployeeTableUpdate}
         isAttributeDirty={props.isAttributeDirty}
         cellData={{
@@ -40,7 +42,7 @@ const EmployeeRow = (props: any) => {
           id: props.id,
         }}
       />
-      <td className='del-cell'>
+      {/* <td className='del-cell'>
         <input
           type='button'
           onClick={onDelEvent}
@@ -48,7 +50,7 @@ const EmployeeRow = (props: any) => {
           className='del-btn'
         />
       </td>
-      {/* <td className='del-cell'>
+      <td className='del-cell'>
         <input type='button' onClick={onSaveEvent} value='Save' />
       </td> */}
     </tr>

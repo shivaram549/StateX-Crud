@@ -32,6 +32,8 @@
 
 .dirtyCell {
   border-color: red;
+  border: red !important;
+  border-style: groove !important;
 }
 
 .dirty {
@@ -51,4 +53,27 @@
   vertical-align: top;
   width: 0;
   z-index: 1;
+}
+
+td,
+th {
+  width: 4rem;
+  height: 2rem;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+th {
+  background: lightblue;
+  border-color: white;
+}
+body {
+  padding: 1rem;
+}
+
+tr:hover {
+  background-color: #f5f5f5;
+}
+
+tr.clicked {
+  background-color: #abc;
 }

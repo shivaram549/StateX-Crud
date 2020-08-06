@@ -4,12 +4,14 @@ import EmployeeRow from './EmployeeRow';
 const EmployeeTable = (props: any) => {
   const rowDel = props.onRowDel;
   const onSaveEvent = props.onSaveEvent;
-  const ononReset = props.onReset;
-  const onResetRecord = props.onResetRecord;
+
+  // const ononReset = props.onReset;
+  // const onResetRecord = props.onResetRecord;
 
   const employee = props.employees.map(function (employee: any, index: number) {
     return (
       <EmployeeRow
+        onUpdate={props.onUpdate}
         onEmployeeTableUpdate={props.onEmployeeTableUpdate}
         employee={employee}
         onDelEvent={rowDel}
@@ -22,7 +24,9 @@ const EmployeeTable = (props: any) => {
   });
   return (
     <>
-      <table className='table table-bordered' style={{ marginTop: '50px' }}>
+      <table
+        className='table table-bordered'
+        style={{ marginTop: '50px', width: '50%' }}>
         <thead>
           <tr>
             <th>_id</th>

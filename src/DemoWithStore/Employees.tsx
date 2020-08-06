@@ -3,6 +3,38 @@ import React from 'react';
 
 import useStateXStore from '../useStateXStore';
 import EmployeeTable from './EmployeeTable';
+import Button from '@material-ui/core/Button';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
+
+import DeleteIcon from '@material-ui/icons/Delete';
+import SaveIcon from '@material-ui/icons/Save';
+import RefreshIcon from '@material-ui/icons/Cached';
+import PlusIcon from '@material-ui/icons/AddCircleOutline';
+import RedoIcon from '@material-ui/icons/Redo';
+import RestoreIcon from '@material-ui/icons/Restore';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+// const useStyles = makeStyles(() =>
+//   createStyles({
+
+//   }),
+// );
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      display: 'flex',
+      '& > * + *': {
+        marginLeft: theme.spacing(2),
+      },
+    },
+    button: {
+      // margin: theme.spacing(1),
+      textTransform: 'none',
+      marginLeft: 10,
+    },
+  }),
+);
 
 export default function Demo() {
   const ds = 'app-employees';
@@ -15,15 +47,26 @@ export default function Demo() {
     updateRecord,
     records,
     save,
-    isDirty,
+    isStoreDirty,
     isAttributeDirty,
+    reset,
   } = useStateXStore(ds, alias);
-  const saveClick = () => {
+  // const saveDisabled = (): boolean => {
+  //   return !isStoreDirty();
+  // };
+
+  const onSave = () => {
     save();
   };
 
+  const dis = !isStoreDirty();
+
   const handleAddEvent = (evt) => {
     createNew({});
+  };
+
+  const handleReset = () => {
+    reset();
   };
 
   const handleEmployeeTable = (evt) => {
@@ -35,6 +78,10 @@ export default function Demo() {
       partialRecord.gender = evt.target.value;
     }
     updateRecord(parseInt(evt.target.id), partialRecord);
+  };
+
+  const onUpdate = (index: number, partialRecord: any) => {
+    updateRecord(index, partialRecord);
   };
 
   const handleRowDel = (id) => {
@@ -57,9 +104,69 @@ export default function Demo() {
     query(filter);
   };
 
+  const classes = useStyles();
+
   return (
     <>
-      <button style={{ marginLeft: '10px' }} onClick={refresh}>
+      <Button
+        variant='contained'
+        color='secondary'
+        className={classes.button}
+        startIcon={<DeleteIcon />}>
+        Delete
+      </Button>
+
+      <Button
+        variant='contained'
+        color='primary'
+        className={classes.button}
+        onClick={onSave}
+        disabled={dis}
+        startIcon={<SaveIcon />}>
+        Save
+      </Button>
+
+      <Button
+        variant='contained'
+        color='default'
+        className={classes.button}
+        onClick={refresh}
+        startIcon={<RefreshIcon />}>
+        Refresh
+      </Button>
+
+      <Button
+        variant='contained'
+        color='default'
+        className={classes.button}
+        onClick={handleAddEvent}
+        startIcon={<PlusIcon />}>
+        Add
+      </Button>
+
+      <Button
+        variant='contained'
+        color='default'
+        className={classes.button}
+        onClick={handleReset}
+        startIcon={<RedoIcon />}>
+        Reset All
+      </Button>
+
+      <Button
+        variant='contained'
+        color='default'
+        className={classes.button}
+        // onClick={resetRecord()}
+        startIcon={<RestoreIcon />}>
+        Reset Current Record
+      </Button>
+
+      <div className={classes.root}>
+        <CircularProgress />
+      </div>
+
+      {/* <button style={{ marginLeft: '10px' }} onClick={refresh}>
         Refresh
       </button>
       <button style={{ marginLeft: '10px' }} onClick={saveClick}>
@@ -77,9 +184,10 @@ export default function Demo() {
       </button>
       <button type='button' style={{ marginLeft: '10px' }}>
         Reset Current Record
-      </button>
+      </button> */}
 
       <EmployeeTable
+        onUpdate={onUpdate}
         onEmployeeTableUpdate={handleEmployeeTable}
         onRowAdd={handleAddEvent}
         onRowDel={handleRowDel}

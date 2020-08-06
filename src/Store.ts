@@ -76,6 +76,9 @@ class Store {
   isStoreDirty = () => {
     const recs = this.get(this.recordsPath);
     const originalRecs = this.get(this.originalRecordsPath);
+    if (originalRecs == null) {
+      return false;
+    }
     return recs !== originalRecs;
   };
 
@@ -134,6 +137,10 @@ class Store {
 
   reset = () => {
     this.setRecords(this.get(this.originalRecordsPath));
+  };
+
+  isBusy = () => {
+    return true;
   };
 
   resetRecord = (index: number) => {
@@ -199,8 +206,7 @@ class Store {
     this.dirtyRecords().forEach((record: any) => {
       const recIndex = storeRecords.indexOf(record);
       // index based logic not working
-
-      if (recIndex > 0) {
+      if (recIndex !== undefined && recIndex !== -1) {
         const currentRecord: any = this.get(this.recordIndexPath, {
           params: {
             id: recIndex,

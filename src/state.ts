@@ -41,7 +41,7 @@ export const recordAction = action(
         break;
       case 'U':
       case 'D':
-        if (index) {
+        if (index !== undefined) {
           path = store.recordIndexPath;
           let record = get(path, {
             params: { index },
