@@ -2,9 +2,12 @@ import { StateXGetter, StateXSetter } from '@cloudio/statex';
 import { getPath } from './state';
 import { post } from './api';
 
-interface Data {
-  key: string;
-  value: any;
+export interface Data {
+  [key: string]: any;
+  _orig: any;
+  // key: string;
+  // value: any;
+  _rs: string;
 }
 
 class Store {
@@ -18,14 +21,15 @@ class Store {
   originalRecordIndexPath: string[];
   recordIndexPath: string[];
   currentRecord: string[]; // remove this
-  currentRecordIndex: string[];
+  currentRecordIndexPath: string[];
+  isBusyPath: string[];
 
   constructor(
     ds: string,
     alias: string,
     set: StateXSetter,
     get: StateXGetter,
-    recordAction: any,
+    recordAction: any
   ) {
     this.ds = ds;
     this.alias = alias;
@@ -40,48 +44,65 @@ class Store {
       ds,
       alias,
       'originalRecords',
-      ':index',
+      ':index'
     );
     this.currentRecord = getPath('pageId', ds, alias, 'currentRecord');
-    this.currentRecordIndex = getPath(
+    this.currentRecordIndexPath = getPath(
       'pageId',
       ds,
       alias,
-      ':currentRecordIndex',
+      ':currentRecordIndex'
     );
+    this.isBusyPath = getPath('pageId', ds, alias, 'busy');
   }
 
-  records = () => {
-    return this.get(this.recordsPath);
+  records = (): Data[] => this.get(this.recordsPath);
+
+  originalRecords = () => this.get(this.originalRecordsPath);
+
+  setRecords = (records: any) => this.set(this.recordsPath, records);
+
+  setRecord = (index: number, record: Data) => {
+    this.set(this.recordIndexPath, record, {
+      params: {
+        index: index,
+      },
+    });
   };
 
-  setRecords = (records: any) => {
-    this.set(this.recordsPath, records);
-  };
-
-  getRecord = (recordIndex: number): Data => {
-    return this.get(this.recordIndexPath, {
+  getRecord = (recordIndex: number): Data =>
+    this.get(this.recordIndexPath, {
       params: {
         index: recordIndex,
+      },
+    });
+
+  getoriginalRecord = (recordIndex: number): Data =>
+    this.get(this.originalRecordIndexPath, {
+      params: {
+        index: recordIndex,
+      },
+    });
+
+  setOriginalRecord = (index: number, record: Data) => {
+    this.set(this.originalRecordIndexPath, record, {
+      params: {
+        index: index,
       },
     });
   };
 
   isAttributeDirty = (recordIndex: number, attribute: string): boolean => {
     const record: Data = this.getRecord(recordIndex);
-
-    //@ts-ignore
     if (record._orig && record._orig[attribute]) {
-      //@ts-ignore
-
       return record[attribute] !== record._orig[attribute];
     }
     return false;
   };
 
   isStoreDirty = () => {
-    const recs = this.get(this.recordsPath);
-    const originalRecs = this.get(this.originalRecordsPath);
+    const recs = this.records();
+    const originalRecs = this.originalRecords();
     if (originalRecs == null) {
       return false;
     }
@@ -89,16 +110,8 @@ class Store {
   };
 
   isRecordDirty = (index: number) => {
-    const rec = this.get(this.recordIndexPath, {
-      params: {
-        index,
-      },
-    });
-    const originalRec = this.get(this.originalRecordIndexPath, {
-      params: {
-        index,
-      },
-    });
+    const rec = this.getRecord(index);
+    const originalRec = this.getoriginalRecord(index);
     if (originalRec === null || originalRec === undefined) {
       return false;
     }
@@ -106,68 +119,45 @@ class Store {
   };
 
   _setCurrentRecord = (record: any, index: number) => {
-    //@ts-ignore
     this.set(this.currentRecord, record);
-    this.set(this.currentRecordIndex, record, {
+    this.set(this.currentRecordIndexPath, record, {
       params: {
         currentRecordIndex: index,
       },
     });
   };
 
-  getCurrentRecord = () => {
-    return this.get(this.currentRecord);
-  };
+  getCurrentRecord = () => this.get(this.currentRecord);
 
   setCurrentRecordIndex = (index: number) => {
-    //@ts-ignore
     if (index >= this.records().length) {
-      //@ts-ignore
       throw Error(
         `Developer ErrorIndex [${index}] being set as current record index cannot be more than the total records [${
-          //@ts-ignore
           this.records().length
-        }]! ${this.alias}`,
+        }]! ${this.alias}`
       );
     }
-    //@ts-ignore
     this._setCurrentRecord(this.records()[index], index);
   };
 
   setCurrentRecord = (record: any) => {
-    //@ts-ignore
     const index = this.records().indexOf(record);
     if (index === -1) {
       throw Error('Index not found');
     }
-    //@ts-ignore
     this._setCurrentRecord(record, index);
   };
 
-  reset = () => {
-    this.setRecords(this.get(this.originalRecordsPath));
-  };
-
-  isBusy = () => {
-    return true;
-  };
+  reset = () => this.setRecords(this.get(this.originalRecordsPath));
 
   resetCurrentRecord = () => {
-    const idx: number = this.get(this.currentRecordIndex);
+    const idx: number = this.get(this.currentRecordIndexPath);
     this.resetRecord(idx);
   };
 
   resetRecord = (index: number) => {
-    const originalRecord = this.get(this.originalRecordIndexPath, {
-      params: {
-        index,
-      },
-    });
-    this.set(this.recordIndexPath, originalRecord, {
-      params: {
-        index: index,
-      },
-    });
+    const originalRecord = this.getoriginalRecord(index);
+    this.setRecord(index, originalRecord);
   };
 
   query = async (filter: any) => {
@@ -179,11 +169,12 @@ class Store {
         },
       },
     };
+    this.set(this.isBusyPath, true);
     await post(reqBody)
       .then((response) => {
         this.setRecords(response[this.alias].data);
         this.set(this.originalRecordsPath, response[this.alias].data);
-        console.log('orig', this.get(this.originalRecordsPath));
+        this.set(this.isBusyPath, false);
       })
       .catch((error) => console.log('error from fetching', error));
   };
@@ -214,6 +205,11 @@ class Store {
     });
   };
 
+  updateFromServer = (recIndex: number, records: any) => {
+    this.setOriginalRecord(recIndex, records[recIndex]);
+    this.setRecord(recIndex, records[recIndex]);
+  };
+
   // TODO: update records using index
   updateRecords = (records: any) => {
     const storeRecords: any = this.records();
@@ -221,27 +217,12 @@ class Store {
       const recIndex = storeRecords.indexOf(record);
       // index based logic not working
       if (recIndex !== undefined && recIndex !== -1) {
-        const currentRecord: any = this.get(this.recordIndexPath, {
-          params: {
-            index: recIndex,
-          },
-        });
+        const currentRecord: any = this.getRecord(recIndex);
         if (currentRecord._rs === 'D') {
           this.recordAction(this.deleteFromStore(recIndex));
         } else {
           // const newRecord = { ...currentRecord, ...record };
-
-          this.set(this.originalRecordIndexPath, records[recIndex], {
-            params: {
-              index: recIndex,
-            },
-          });
-
-          this.set(this.recordIndexPath, records[recIndex], {
-            params: {
-              index: recIndex,
-            },
-          });
+          this.updateFromServer(recIndex, records);
         }
       } else {
         storeRecords.forEach((storeRecord: any) => {
@@ -252,30 +233,25 @@ class Store {
               this.deleteFromStore(recIdx);
             } else {
               const newRecord = { ...storeRecord, ...record };
-              this.set(this.recordIndexPath, newRecord, {
-                params: {
-                  index: recIdx,
-                },
-              });
+              this.setRecord(recIdx, newRecord);
             }
           }
         });
       }
     });
+    this.set(this.isBusyPath, false);
   };
 
   dirtyRecords = () => {
-    // @ts-ignore
     let dirtyRecords = this.records().filter(
-      // @ts-ignore
-      (record: any) => record._rs !== 'Q',
+      (record: any) => record._rs !== 'Q'
     );
     return dirtyRecords;
   };
 
-  isDirty = () => {
-    return this.dirtyRecords().length > 0;
-  };
+  isDirty = () => this.dirtyRecords().length > 0;
+
+  isBusy = () => this.get(this.isBusyPath);
 
   save = async () => {
     const dirtyRecords = this.dirtyRecords().map((dirtyRecord: any) => {
@@ -289,6 +265,8 @@ class Store {
         data: dirtyRecords,
       },
     };
+    this.set(this.isBusyPath, true);
+
     console.log('reqBody', reqBody);
 
     await post(reqBody)
