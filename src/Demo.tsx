@@ -18,7 +18,7 @@ export default function Demo() {
   const {
     deleteRecord,
     query,
-    insertRecordPartial,
+    insertRecord,
     updateRecord,
     records,
     save,
@@ -45,7 +45,7 @@ export default function Demo() {
   const commitChanges = ({ added, changed, deleted }) => {
     if (added) {
       Object.keys(added).forEach((key) => {
-        insertRecordPartial(added[key]);
+        insertRecord(added[key]);
       });
     }
     if (changed) {

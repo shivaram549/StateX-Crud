@@ -9,7 +9,7 @@ export default (ds: string, dsAlias: string) => {
 
   return {
     query: store.query,
-    insertRecordPartial: store.insertRecordPartial,
+    insertRecord: store.insertRecord,
     updateRecord: store.updateRecord,
     deleteRecord: store.delete,
     dirtyRecords: store.dirtyRecords,

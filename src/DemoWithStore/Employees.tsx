@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textTransform: 'none',
       marginLeft: 10,
     },
-  })
+  }),
 );
 
 export default function Demo() {
@@ -37,7 +37,7 @@ export default function Demo() {
     deleteRecord,
     query,
     createNew,
-    insertRecordPartial,
+    insertRecord,
     updateRecord,
     records,
     save,
@@ -90,7 +90,7 @@ export default function Demo() {
     const { employee } = props;
     const partialRecord = { name: employee.name, gender: employee.gender };
     console.log('>rpops', partialRecord);
-    insertRecordPartial(partialRecord);
+    insertRecord(partialRecord);
   };
 
   const employees: any = records().filter((record: any) => record._rs !== 'D');

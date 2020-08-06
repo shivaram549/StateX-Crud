@@ -29,7 +29,7 @@ class Store {
     alias: string,
     set: StateXSetter,
     get: StateXGetter,
-    recordAction: any
+    recordAction: any,
   ) {
     this.ds = ds;
     this.alias = alias;
@@ -44,23 +44,29 @@ class Store {
       ds,
       alias,
       'originalRecords',
-      ':index'
+      ':index',
     );
     this.currentRecord = getPath('pageId', ds, alias, 'currentRecord');
     this.currentRecordIndexPath = getPath(
       'pageId',
       ds,
       alias,
-      ':currentRecordIndex'
+      ':currentRecordIndex',
     );
     this.isBusyPath = getPath('pageId', ds, alias, 'busy');
   }
 
-  records = (): Data[] => this.get(this.recordsPath);
+  records = (): Data[] => {
+    return this.get(this.recordsPath);
+  };
 
-  originalRecords = () => this.get(this.originalRecordsPath);
+  originalRecords = () => {
+    return this.get(this.originalRecordsPath);
+  };
 
-  setRecords = (records: any) => this.set(this.recordsPath, records);
+  setRecords = (records: Data[]) => {
+    this.set(this.recordsPath, records);
+  };
 
   setRecord = (index: number, record: Data) => {
     this.set(this.recordIndexPath, record, {
@@ -100,7 +106,7 @@ class Store {
     return false;
   };
 
-  isStoreDirty = () => {
+  isStoreDirty = (): boolean => {
     const recs = this.records();
     const originalRecs = this.originalRecords();
     if (originalRecs == null) {
@@ -109,7 +115,7 @@ class Store {
     return JSON.stringify(recs) !== JSON.stringify(originalRecs);
   };
 
-  isRecordDirty = (index: number) => {
+  isRecordDirty = (index: number): boolean => {
     const rec = this.getRecord(index);
     const originalRec = this.getoriginalRecord(index);
     if (originalRec === null || originalRec === undefined) {
@@ -127,14 +133,16 @@ class Store {
     });
   };
 
-  getCurrentRecord = () => this.get(this.currentRecord);
+  getCurrentRecord = (): Data => {
+    return this.get(this.currentRecord);
+  };
 
   setCurrentRecordIndex = (index: number) => {
     if (index >= this.records().length) {
       throw Error(
         `Developer ErrorIndex [${index}] being set as current record index cannot be more than the total records [${
           this.records().length
-        }]! ${this.alias}`
+        }]! ${this.alias}`,
       );
     }
     this._setCurrentRecord(this.records()[index], index);
@@ -148,7 +156,9 @@ class Store {
     this._setCurrentRecord(record, index);
   };
 
-  reset = () => this.setRecords(this.get(this.originalRecordsPath));
+  reset = () => {
+    this.setRecords(this.get(this.originalRecordsPath));
+  };
 
   resetCurrentRecord = () => {
     const idx: number = this.get(this.currentRecordIndexPath);
@@ -160,6 +170,10 @@ class Store {
     this.setRecord(index, originalRecord);
   };
 
+  setBusy = (busy: boolean) => {
+    this.set(this.isBusyPath, busy);
+  };
+
   query = async (filter: any) => {
     const reqBody = {
       [this.alias]: {
@@ -169,12 +183,12 @@ class Store {
         },
       },
     };
-    this.set(this.isBusyPath, true);
+    this.setBusy(true);
     await post(reqBody)
       .then((response) => {
         this.setRecords(response[this.alias].data);
         this.set(this.originalRecordsPath, response[this.alias].data);
-        this.set(this.isBusyPath, false);
+        this.setBusy(false);
       })
       .catch((error) => console.log('error from fetching', error));
   };
@@ -196,7 +210,7 @@ class Store {
     });
   };
 
-  insertRecordPartial = (partialRecord: any) => {
+  insertRecord = (partialRecord: any) => {
     this.recordAction({
       store: this,
       actionType: 'I',
@@ -212,7 +226,7 @@ class Store {
 
   // TODO: update records using index
   updateRecords = (records: any) => {
-    const storeRecords: any = this.records();
+    const storeRecords: Data[] = this.records();
     this.dirtyRecords().forEach((record: any) => {
       const recIndex = storeRecords.indexOf(record);
       // index based logic not working
@@ -244,7 +258,7 @@ class Store {
 
   dirtyRecords = () => {
     let dirtyRecords = this.records().filter(
-      (record: any) => record._rs !== 'Q'
+      (record: any) => record._rs !== 'Q',
     );
     return dirtyRecords;
   };
