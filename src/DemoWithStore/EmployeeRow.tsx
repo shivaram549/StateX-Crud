@@ -1,15 +1,8 @@
 import React from 'react';
 import EditableCell from './EditableCell';
+import LockIcon from '@material-ui/icons/Lock';
 
 const EmployeeRow = (props: any) => {
-  const onDelEvent = () => {
-    props.onDelEvent(props.id);
-  };
-
-  const onSaveEvent = () => {
-    props.onSaveEvent(props);
-  };
-
   return (
     <tr>
       <EditableCell
@@ -42,6 +35,10 @@ const EmployeeRow = (props: any) => {
           id: props.id,
         }}
       />
+      <td className='del-cell'>
+        {props.isRecordDirty(props.id) ? 'Dirty' : <LockIcon />}
+      </td>
+
       {/* <td className='del-cell'>
         <input
           type='button'

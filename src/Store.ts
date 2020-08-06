@@ -2,6 +2,11 @@ import { StateXGetter, StateXSetter } from '@cloudio/statex';
 import { getPath } from './state';
 import { post } from './api';
 
+interface Data {
+  key: string;
+  value: any;
+}
+
 class Store {
   ds: string;
   alias: string;
@@ -20,7 +25,7 @@ class Store {
     alias: string,
     set: StateXSetter,
     get: StateXGetter,
-    recordAction: any
+    recordAction: any,
   ) {
     this.ds = ds;
     this.alias = alias;
@@ -35,14 +40,14 @@ class Store {
       ds,
       alias,
       'originalRecords',
-      ':index'
+      ':index',
     );
     this.currentRecord = getPath('pageId', ds, alias, 'currentRecord');
     this.currentRecordIndex = getPath(
       'pageId',
       ds,
       alias,
-      ':currentRecordIndex'
+      ':currentRecordIndex',
     );
   }
 
@@ -54,15 +59,16 @@ class Store {
     this.set(this.recordsPath, records);
   };
 
-  isAttributeDirty = (recordIndex: number, attribute: string): boolean => {
-    //@ts-ignore
-    const record = this.get(this.recordIndexPath, {
+  getRecord = (recordIndex: number): Data => {
+    return this.get(this.recordIndexPath, {
       params: {
         index: recordIndex,
       },
     });
-    //@ts-ignore
-    console.log('record>>', record);
+  };
+
+  isAttributeDirty = (recordIndex: number, attribute: string): boolean => {
+    const record: Data = this.getRecord(recordIndex);
 
     //@ts-ignore
     if (record._orig && record._orig[attribute]) {
@@ -88,12 +94,15 @@ class Store {
         index,
       },
     });
-    const originalRec = this.get(this.recordIndexPath, {
+    const originalRec = this.get(this.originalRecordIndexPath, {
       params: {
         index,
       },
     });
-    return rec !== originalRec;
+    if (originalRec === null || originalRec === undefined) {
+      return false;
+    }
+    return JSON.stringify(rec) !== JSON.stringify(originalRec);
   };
 
   _setCurrentRecord = (record: any, index: number) => {
@@ -118,7 +127,7 @@ class Store {
         `Developer ErrorIndex [${index}] being set as current record index cannot be more than the total records [${
           //@ts-ignore
           this.records().length
-        }]! ${this.alias}`
+        }]! ${this.alias}`,
       );
     }
     //@ts-ignore
@@ -254,7 +263,7 @@ class Store {
     // @ts-ignore
     let dirtyRecords = this.records().filter(
       // @ts-ignore
-      (record: any) => record._rs !== 'Q'
+      (record: any) => record._rs !== 'Q',
     );
     return dirtyRecords;
   };

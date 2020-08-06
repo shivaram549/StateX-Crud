@@ -7,15 +7,15 @@ export function getPath(
   recordsType?: string,
   indexKey?: string,
 ): string[] {
-  const rootPath = ['root', pageId, 'dataStore', ds, alias];
+  const path = ['root', pageId, 'dataStore', ds, alias];
   if (recordsType) {
-    rootPath[rootPath.length] = recordsType;
+    path[path.length] = recordsType;
   }
   if (indexKey) {
-    rootPath[rootPath.length] = indexKey;
+    path[path.length] = indexKey;
   }
-  console.log('root records path', rootPath);
-  return rootPath;
+  console.log('records path', path);
+  return path;
 }
 
 // @ts-ignore

@@ -1,13 +1,10 @@
 //@ts-nocheck
 import { useStateXValue } from '@cloudio/statex';
 import useDataStore from './useDataStore';
-import { pageContextAtom } from '../components/Components';
-import Store from './Store';
 
 export default (ds: string, dsAlias: string) => {
   const store = useDataStore(ds, dsAlias);
   useStateXValue(store.recordsPath, []);
-  // useStateXValue(store.recordIndexPath, []);
 
   return {
     query: store.query,

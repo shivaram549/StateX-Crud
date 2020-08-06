@@ -2,16 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import TextField from '@material-ui/core/TextField';
 
-const styles = {
-  input1: {
-    height: 50,
-  },
-  input2: {
-    height: 200,
-    fontSize: '3em',
-  },
-};
-
 const EditableCell = (props: any) => {
   // console.log('...props in cell', props);
   const [val, setVal] = useState(props.cellData.value);

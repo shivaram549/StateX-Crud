@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textTransform: 'none',
       marginLeft: 10,
     },
-  })
+  }),
 );
 
 export default function Demo() {
@@ -44,6 +44,7 @@ export default function Demo() {
     isStoreDirty,
     isAttributeDirty,
     reset,
+    isRecordDirty,
   } = useStateXStore(ds, alias);
   // const saveDisabled = (): boolean => {
   //   return !isStoreDirty();
@@ -156,6 +157,7 @@ export default function Demo() {
       </Button>
 
       <div className={classes.root}>
+        isbusy
         <CircularProgress />
       </div>
 
@@ -180,6 +182,7 @@ export default function Demo() {
       </button> */}
 
       <EmployeeTable
+        isRecordDirty={isRecordDirty}
         onUpdate={onUpdate}
         onEmployeeTableUpdate={handleEmployeeTable}
         onRowAdd={handleAddEvent}

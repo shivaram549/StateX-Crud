@@ -11,6 +11,7 @@ const EmployeeTable = (props: any) => {
   const employee = props.employees.map(function (employee: any, index: number) {
     return (
       <EmployeeRow
+        isRecordDirty={props.isRecordDirty}
         onUpdate={props.onUpdate}
         onEmployeeTableUpdate={props.onEmployeeTableUpdate}
         employee={employee}

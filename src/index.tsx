@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import { StateXProvider } from '@cloudio/statex';
 import './index.css';
 import App from './App';
-import Demo from './Demo';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
@@ -12,7 +11,7 @@ ReactDOM.render(
       <App />
     </StateXProvider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
 
 // If you want your app to work offline and load faster, you can change
