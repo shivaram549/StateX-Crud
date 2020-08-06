@@ -13,6 +13,7 @@ import PlusIcon from '@material-ui/icons/AddCircleOutline';
 import RedoIcon from '@material-ui/icons/Redo';
 import RestoreIcon from '@material-ui/icons/Restore';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { useStateXValue } from '@cloudio/statex';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -45,6 +46,7 @@ export default function Demo() {
     isAttributeDirty,
     reset,
     isRecordDirty,
+    currentRecord,
   } = useStateXStore(ds, alias);
   // const saveDisabled = (): boolean => {
   //   return !isStoreDirty();
@@ -155,7 +157,10 @@ export default function Demo() {
         startIcon={<RestoreIcon />}>
         Reset Current Record
       </Button>
-
+      <br />
+      <br />
+      {currentRecord}
+      <br />
       <div className={classes.root}>
         isbusy
         <CircularProgress />

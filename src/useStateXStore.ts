@@ -23,5 +23,6 @@ export default (ds: string, dsAlias: string) => {
     getCurrentRecord: store.getCurrentRecord,
     setCurrentRecord: store.setCurrentRecord,
     createNew: store.createNew,
+    currentRecord: store.getCurrentRecord,
   };
 };

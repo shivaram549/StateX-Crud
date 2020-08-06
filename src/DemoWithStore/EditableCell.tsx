@@ -33,6 +33,7 @@ const EditableCell = (props: any) => {
         //   disabled={disabled}
         // />
         <TextField
+          onClick={() => console.log('clicked')}
           id='outlined-basic'
           value={val}
           size='small'
