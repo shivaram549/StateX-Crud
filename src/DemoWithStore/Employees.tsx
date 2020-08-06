@@ -23,11 +23,10 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     button: {
-      // margin: theme.spacing(1),
       textTransform: 'none',
       marginLeft: 10,
     },
-  }),
+  })
 );
 
 export default function Demo() {
@@ -47,10 +46,9 @@ export default function Demo() {
     isRecordDirty,
     currentRecord,
     isBusy,
+    setCurrentRecordIndex,
+    currentRecordIndex,
   } = useStateXStore(ds, alias);
-  // const saveDisabled = (): boolean => {
-  //   return !isStoreDirty();
-  // };
 
   const onSave = () => {
     save();
@@ -98,6 +96,11 @@ export default function Demo() {
   const refresh = () => {
     const filter = { _deleted: 'N' };
     query(filter);
+  };
+
+  const setCurrentRecordIndexVal = (index: number) => {
+    console.log('>>index', index);
+    setCurrentRecordIndex(index);
   };
 
   const classes = useStyles();
@@ -164,26 +167,7 @@ export default function Demo() {
       <div className={classes.root}>
         {isBusy() ? <CircularProgress /> : null}
       </div>
-
-      {/* <button style={{ marginLeft: '10px' }} onClick={refresh}>
-        Refresh
-      </button>
-      <button style={{ marginLeft: '10px' }} onClick={saveClick}>
-        Save
-      </button>
-
-      <button
-        type='button'
-        style={{ marginLeft: '10px' }}
-        onClick={handleAddEvent}>
-        Add
-      </button>
-      <button type='button' style={{ marginLeft: '10px' }}>
-        Reset All
-      </button>
-      <button type='button' style={{ marginLeft: '10px' }}>
-        Reset Current Record
-      </button> */}
+      <div>currentRecordIndex: {currentRecordIndex()}</div>
 
       <EmployeeTable
         isRecordDirty={isRecordDirty}
@@ -196,6 +180,7 @@ export default function Demo() {
         isAttributeDirty={isAttributeDirty}
         onReset={onReset}
         onResetRecord={onResetRecord}
+        setCurrentRecordIndex={setCurrentRecordIndexVal}
       />
     </>
   );

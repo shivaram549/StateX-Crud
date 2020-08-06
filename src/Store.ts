@@ -20,7 +20,6 @@ class Store {
   originalRecordsPath: string[];
   originalRecordIndexPath: string[];
   recordIndexPath: string[];
-  currentRecord: string[]; // remove this
   currentRecordIndexPath: string[];
   isBusyPath: string[];
 
@@ -29,7 +28,7 @@ class Store {
     alias: string,
     set: StateXSetter,
     get: StateXGetter,
-    recordAction: any,
+    recordAction: any
   ) {
     this.ds = ds;
     this.alias = alias;
@@ -44,14 +43,13 @@ class Store {
       ds,
       alias,
       'originalRecords',
-      ':index',
+      ':index'
     );
-    this.currentRecord = getPath('pageId', ds, alias, 'currentRecord');
     this.currentRecordIndexPath = getPath(
       'pageId',
       ds,
       alias,
-      ':currentRecordIndex',
+      'currentRecordIndex'
     );
     this.isBusyPath = getPath('pageId', ds, alias, 'busy');
   }
@@ -124,36 +122,19 @@ class Store {
     return JSON.stringify(rec) !== JSON.stringify(originalRec);
   };
 
-  _setCurrentRecord = (record: any, index: number) => {
-    this.set(this.currentRecord, record);
-    this.set(this.currentRecordIndexPath, record, {
-      params: {
-        currentRecordIndex: index,
-      },
-    });
-  };
-
-  getCurrentRecord = (): Data => {
-    return this.get(this.currentRecord);
-  };
-
   setCurrentRecordIndex = (index: number) => {
     if (index >= this.records().length) {
       throw Error(
         `Developer ErrorIndex [${index}] being set as current record index cannot be more than the total records [${
           this.records().length
-        }]! ${this.alias}`,
+        }]! ${this.alias}`
       );
     }
-    this._setCurrentRecord(this.records()[index], index);
+    this.set(this.currentRecordIndexPath, index);
   };
 
-  setCurrentRecord = (record: any) => {
-    const index = this.records().indexOf(record);
-    if (index === -1) {
-      throw Error('Index not found');
-    }
-    this._setCurrentRecord(record, index);
+  currentRecordIndex = (): number => {
+    return this.get(this.currentRecordIndexPath);
   };
 
   reset = () => {
@@ -243,7 +224,6 @@ class Store {
           if (record.name === storeRecord.name) {
             const recIdx = storeRecords.indexOf(storeRecord);
             if (record._deleted === 'Y' || record._rs === 'D') {
-              // remove from list using index
               this.deleteFromStore(recIdx);
             } else {
               const newRecord = { ...storeRecord, ...record };
@@ -258,7 +238,7 @@ class Store {
 
   dirtyRecords = () => {
     let dirtyRecords = this.records().filter(
-      (record: any) => record._rs !== 'Q',
+      (record: any) => record._rs !== 'Q'
     );
     return dirtyRecords;
   };

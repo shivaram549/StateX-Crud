@@ -19,6 +19,7 @@ const EmployeeRow = (props: any) => {
         onUpdate={props.onUpdate}
         onEmployeeTableUpdate={props.onEmployeeTableUpdate}
         isAttributeDirty={props.isAttributeDirty}
+        setCurrentRecordIndex={props.setCurrentRecordIndex}
         cellData={{
           type: 'name',
           value: props.employee.name,
@@ -29,6 +30,7 @@ const EmployeeRow = (props: any) => {
         onUpdate={props.onUpdate}
         onEmployeeTableUpdate={props.onEmployeeTableUpdate}
         isAttributeDirty={props.isAttributeDirty}
+        setCurrentRecordIndex={props.setCurrentRecordIndex}
         cellData={{
           type: 'gender',
           value: props.employee.gender,

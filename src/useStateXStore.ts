@@ -6,6 +6,7 @@ export default (ds: string, dsAlias: string) => {
   const store = useDataStore(ds, dsAlias);
   useStateXValue(store.recordsPath, []);
   useStateXValue(store.isBusyPath, false);
+  useStateXValue(store.currentRecordIndexPath, false);
 
   return {
     query: store.query,
@@ -26,5 +27,7 @@ export default (ds: string, dsAlias: string) => {
     createNew: store.createNew,
     currentRecord: store.getCurrentRecord,
     isBusy: store.isBusy,
+    setCurrentRecordIndex: store.setCurrentRecordIndex,
+    currentRecordIndex: store.currentRecordIndex,
   };
 };

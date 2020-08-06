@@ -5,9 +5,6 @@ const EmployeeTable = (props: any) => {
   const rowDel = props.onRowDel;
   const onSaveEvent = props.onSaveEvent;
 
-  // const ononReset = props.onReset;
-  // const onResetRecord = props.onResetRecord;
-
   const employee = props.employees.map(function (employee: any, index: number) {
     return (
       <EmployeeRow
@@ -20,6 +17,7 @@ const EmployeeTable = (props: any) => {
         id={index}
         key={index}
         isAttributeDirty={props.isAttributeDirty}
+        setCurrentRecordIndex={props.setCurrentRecordIndex}
       />
     );
   });
