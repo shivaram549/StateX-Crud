@@ -55,7 +55,7 @@ export default function Demo() {
   const onSave = () => {
     save();
   };
-  const dis = !isStoreDirty();
+  const dis = !isStoreDirty() || isBusy;
 
   const handleAddEvent = (evt) => {
     createNew();
@@ -93,7 +93,7 @@ export default function Demo() {
     insertRecord(partialRecord);
   };
 
-  const employees: any = records().filter((record: any) => {
+  const employees: any = records.filter((record: any) => {
     console.log('<<rec', record);
     if (record === undefined) {
       return false;
@@ -180,11 +180,9 @@ export default function Demo() {
       <br />
       {currentRecord}
       <br />
-      <div className={classes.root}>
-        {isBusy() ? <CircularProgress /> : null}
-      </div>
+      <div className={classes.root}>{isBusy ? <CircularProgress /> : null}</div>
       <div>
-        <strong>currentRecordIndex: {currentRecordIndex()}</strong>
+        <strong>currentRecordIndex: {currentRecordIndex}</strong>
       </div>
 
       <EmployeeTable

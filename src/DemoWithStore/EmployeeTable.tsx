@@ -16,6 +16,7 @@ const EmployeeTable = (props: any) => {
         onSaveEvent={onSaveEvent}
         id={index}
         key={index}
+        // key={employee._id}
         isAttributeDirty={props.isAttributeDirty}
         setCurrentRecordIndex={props.setCurrentRecordIndex}
       />

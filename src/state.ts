@@ -1,5 +1,8 @@
 import { action } from '@cloudio/statex';
 import Store, { Data } from './Store';
+import { v4 as uuid } from 'uuid';
+
+let count = 0;
 export function getPath(
   pageId: string,
   ds: string,
@@ -40,6 +43,7 @@ export const recordAction = action(
         path = store.recordsPath;
         records = get(path) as [];
         records = [...records, { _rs: 'N' }];
+        // records = [{ _rs: 'N', _id: uuid() }, ...records];
         set(path, records);
         break;
       case 'U':

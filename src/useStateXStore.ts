@@ -4,11 +4,14 @@ import useDataStore from './useDataStore';
 
 export default (ds: string, dsAlias: string) => {
   const store = useDataStore(ds, dsAlias);
-  useStateXValue(store.currentRecordIndexPath, false);
+  const currentRecordIndex = useStateXValue(
+    store.currentRecordIndexPath,
+    false
+  );
 
-  useStateXValue(store.isBusyPath, false);
+  const isBusy = useStateXValue(store.isBusyPath, false);
 
-  useStateXValue(store.recordsPath, []);
+  const records = useStateXValue(store.recordsPath, []);
 
   return {
     query: store.query,
@@ -17,21 +20,17 @@ export default (ds: string, dsAlias: string) => {
     deleteRecord: store.delete,
     dirtyRecords: store.dirtyRecords,
     save: store.save,
-    records: store.records,
-    isDirty: store.isDirty,
+    records,
     isAttributeDirty: store.isAttributeDirty,
     reset: store.reset,
     resetRecord: store.resetRecord,
     resetCurrentRecord: store.resetCurrentRecord,
     isRecordDirty: store.isRecordDirty,
     isStoreDirty: store.isStoreDirty,
-    getCurrentRecord: store.getCurrentRecord,
-    setCurrentRecord: store.setCurrentRecord,
     createNew: store.createNew,
-    currentRecord: store.getCurrentRecord,
-    isBusy: store.isBusy,
+    isBusy,
     setCurrentRecordIndex: store.setCurrentRecordIndex,
-    currentRecordIndex: store.currentRecordIndex,
+    currentRecordIndex,
     deleteCurrentRecord: store.deleteCurrentRecord,
   };
 };

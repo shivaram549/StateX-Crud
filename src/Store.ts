@@ -28,7 +28,7 @@ class Store {
     alias: string,
     set: StateXSetter,
     get: StateXGetter,
-    recordAction: any,
+    recordAction: any
   ) {
     this.ds = ds;
     this.alias = alias;
@@ -43,13 +43,13 @@ class Store {
       ds,
       alias,
       'originalRecords',
-      ':index',
+      ':index'
     );
     this.currentRecordIndexPath = getPath(
       'pageId',
       ds,
       alias,
-      'currentRecordIndex',
+      'currentRecordIndex'
     );
     this.isBusyPath = getPath('pageId', ds, alias, 'busy');
   }
@@ -137,7 +137,7 @@ class Store {
       throw Error(
         `Developer ErrorIndex [${index}] being set as current record index cannot be more than the total records [${
           this.records().length
-        }]! ${this.alias}`,
+        }]! ${this.alias}`
       );
     }
     this.set(this.currentRecordIndexPath, index);
@@ -221,7 +221,7 @@ class Store {
   };
 
   //todo-locking
-  updateRecords = (records: Data[]) => {
+  updateRecords = (serverRecords: Data[]) => {
     const storeRecords: Data[] = this.records();
     const dirtyRecords = this.dirtyRecords();
     const size = dirtyRecords.length;
@@ -233,7 +233,9 @@ class Store {
         if (currentRecord._rs === 'D') {
           this.deleteFromStore(recIndex);
         } else {
-          this.updateFromServer(recIndex, records[i]);
+          if (serverRecords.length > i) {
+            this.updateFromServer(recIndex, serverRecords[i]);
+          }
         }
       }
     }
@@ -242,7 +244,7 @@ class Store {
 
   dirtyRecords = () => {
     let dirtyRecords = this.records().filter(
-      (record: any) => record._rs !== 'Q',
+      (record: any) => record._rs !== 'Q' && record._rs !== 'N'
     );
     return dirtyRecords;
   };
